@@ -1,7 +1,3 @@
-var v1 = require('delegates');
-var v2 = require('./');
-require('should');
-
 function createDelegator(v){
   function Constructor(delegate){
     this.delegate = delegate;
@@ -27,17 +23,15 @@ function createDelegator(v){
   return Constructor;
 }
 
-var D1 = createDelegator(v1);
-var D2 = createDelegator(v2);
-
 function Delegate(){}
 Delegate.prototype.testMethod = function(){
   return this.testProperty;
 };
 
-function runTest(Constructor){
-  var start = Date.now();
-  for(var value = 0; value < 10000000; value++){
+function runTest(implementation,len){
+  var start = process.hrtime();
+  var Constructor = createDelegator(implementation);
+  for(var value = 0; value < len; value++){
     var delegator = new Constructor(new Delegate());
     delegator.testProperty = value;
     delegator.a = delegator.b = delegator.c = delegator.d = value;
@@ -64,15 +58,28 @@ function runTest(Constructor){
       throw new Error('did not work for value: ' + value);
     }
   }
-  var time = Date.now() - start;
-
-  console.log('time was: ' + time);
+  var end = process.hrtime();
+  var time = (end[0]-start[0])*1000000000 + (end[1] -start[1]);
 
   return time;
 }
 
-var t2 = runTest(D2);
-var t1 = runTest(D1);
+function runFor(len){
+  console.log('looping %d times', len);
+  var t2 = runTest(require('./'), len);
+  var t1 = runTest(require('delegates'), len);
 
-console.log('new version ' + (Math.round(((t1-t2)/t1)*10000)/100) + '% faster');
-console.log('old version ' + (Math.round(((t1-t2)/t2)*10000)/100) + '% slower');
+  console.log('\tnew version executed in %d nanoseconds (%d% faster)',  t2, (Math.round(((t1-t2)/t1)*10000)/100));
+  console.log('\told version executed in %d nanoseconds (%d% slower)\n',  t1, (Math.round(((t1-t2)/t2)*10000)/100));
+}
+
+runFor(1);
+runFor(100);
+runFor(1000);
+runFor(1500);
+runFor(2000);
+runFor(5000);
+runFor(10000);
+runFor(100000);
+runFor(1000000);
+runFor(10000000);
