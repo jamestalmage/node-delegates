@@ -37,28 +37,32 @@ Delegate.prototype.testMethod = function(){
 
 function runTest(Constructor){
   var start = Date.now();
-  for(var value = 0; value < 1000000; value++){
+  for(var value = 0; value < 10000000; value++){
     var delegator = new Constructor(new Delegate());
     delegator.testProperty = value;
     delegator.a = delegator.b = delegator.c = delegator.d = value;
     delegator.e = delegator.f = delegator.g = delegator.h = value;
     delegator.i = delegator.j = delegator.k = delegator.l = value;
-    delegator.a.should.equal(value);
-    delegator.b.should.equal(value);
-    delegator.c.should.equal(value);
-    delegator.d.should.equal(value);
-    delegator.e.should.equal(value);
-    delegator.f.should.equal(value);
-    delegator.g.should.equal(value);
-    delegator.h.should.equal(value);
-    delegator.i.should.equal(value);
-    delegator.j.should.equal(value);
-    delegator.k.should.equal(value);
-    delegator.l.should.equal(value);
-    delegator.testProperty.should.equal(value);
-    delegator.testMethod().should.equal(value);
     delegator.fluentProp(value);
-    delegator.fluentProp().should.equal(value);
+    if(
+        delegator.a !== value ||
+        delegator.b !== value ||
+        delegator.c !== value ||
+        delegator.d !== value ||
+        delegator.e !== value ||
+        delegator.f !== value ||
+        delegator.g !== value ||
+        delegator.h !== value ||
+        delegator.i !== value ||
+        delegator.j !== value ||
+        delegator.k !== value ||
+        delegator.l !== value ||
+        delegator.testProperty !== value ||
+        delegator.testMethod() !== value ||
+        delegator.fluentProp() !== value
+    ){
+      throw new Error('did not work for value: ' + value);
+    }
   }
   var time = Date.now() - start;
 
@@ -70,4 +74,5 @@ function runTest(Constructor){
 var t2 = runTest(D2);
 var t1 = runTest(D1);
 
-console.log('new version ' + (Math.round(((t1-t2)/t2)*10000)/100) + '% faster');
+console.log('new version ' + (Math.round(((t1-t2)/t1)*10000)/100) + '% faster');
+console.log('old version ' + (Math.round(((t1-t2)/t2)*10000)/100) + '% slower');
