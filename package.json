@@ -1,5 +1,5 @@
 {
-  "name": "delegates",
+  "name": "delegates-compile-func-perf-test",
   "version": "0.1.0",
   "repository": "visionmedia/node-delegates",
   "description": "delegate methods and accessors to another property",
